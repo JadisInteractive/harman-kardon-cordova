@@ -1,16 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<plugin id="your.name.space.yourPluginName" version="0.1.0" xmlns="http://apache.org/cordova/ns/plugins/1.0">
-  <name>cordova-plugin-yourPluginName</name>
-  <js-module name="yourPluginName" src="www/yourPluginName.js">
-    <clobbers target="cordova.plugins.yourPluginName" />
-  </js-module>
-  <platform name="ios">
-    <hook type="after_plugin_install" src="hooks/add_swift_support.js" />
-    <config-file parent="/*" target="config.xml">
-      <feature name="YourPluginName">
-        <param name="ios-package" value="YourPluginNamePlugin" />
-      </feature>
-    </config-file>
-    <source-file src="src/ios/yourPluginNamePlugin.swift" />
-  </platform>
+<!-- TODO comments, header -->
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android" id="org.crudworks.cordova.plugins.cordovaboilerplateplugin" version="0.0.1">
+	<name>CordovaBoilerPlatePlugin</name>
+	<description>Cordova Boiler Plate Plugin</description>
+	<license>MIT</license>
+	<keywords>cordova, plugin, boilerplate, android, ios</keywords>
+	<repo>https://github.com/simonprickett/cordovaboilerplateplugin.git</repo>
+	<issue>https://github.com/simonprickett/cordovaboilerplateplugin/issues</issue>
+
+	<js-module src="www/CordovaBoilerPlatePlugin.js" name="CordovaBoilerPlatePlugin">
+		<clobbers target="CordovaBoilerPlatePlugin" />
+	</js-module>
+
+	<!-- iOS -->
+	<platform name="ios">
+		<config-file target="config.xml" parent="/*">
+			<feature name="CordovaBoilerPlatePlugin">
+				<param name="ios-package" value="CordovaBoilerPlatePlugin"/>
+			</feature>
+		</config-file>
+		<header-file src="src/ios/CordovaBoilerPlatePlugin.h"/>
+		<source-file src="src/ios/CordovaBoilerPlatePlugin.m"/>
+	</platform>
+
+	<!-- Android -->
+	<platform name="android">
+		<config-file target="res/xml/config.xml" parent="/*">
+			<feature name="CordovaBoilerPlatePlugin">
+				<param name="android-package" value="org.crudworks.cordova.plugins.CordovaBoilerPlatePlugin"/>
+			</feature>
+		</config-file>
+		<source-file src="src/android/org/crudworks/cordova/plugins/CordovaBoilerPlatePlugin.java" target-dir="src/org/crudworks/cordova/plugins/"/>
+	</platform>
 </plugin>

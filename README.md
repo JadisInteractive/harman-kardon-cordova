@@ -1,9 +1,6 @@
-# harman-kardon-cordova-plugin
+cordovaboilerplateplugin
+========================
 
-iOS Cordova plugin for [Harman Kardon API](http://harmandeveloperdocs.readthedocs.org/) written in Swift.
+Cordova Plugin Boilerplate
 
-## Usage
-
-
-
-
+TODO: Complete README.md
