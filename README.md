@@ -12,4 +12,4 @@ This requires cordova 5.0+ ( current stable 1.0.0 )
 
 
 ## Remove Plugin
-     cordova plugin add https://github.com/brainrainteam/harman-kardon-cordova.git
+     cordova plugin rm com.brainrainsolutions.hkaudio

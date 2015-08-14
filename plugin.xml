@@ -23,9 +23,8 @@
       </feature>
     </config-file>
 
-    <header-file src="src/ios/HKAudio.h" target-dir="HKaudioPlugin"/>
-    <source-file src="src/ios/HKAudio.m" target-dir="HKaudioPlugin"/>
+    <header-file src="src/ios/HKAudio.h" target-dir="HKAudioPlugin"/>
+    <source-file src="src/ios/HKAudio.m" target-dir="HKAudioPlugin"/>
   </platform>
-
 
 </plugin>
