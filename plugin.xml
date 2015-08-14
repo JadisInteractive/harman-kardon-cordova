@@ -34,6 +34,7 @@
    <header-file src="src/ios/HKWirelessHDSDK/include/HKWPlayerEventHandlerSingleton.h" />
    <framework src="libbz2.dylib" />
    <framework src="libz.dylib" />
+   <framework src="libstdc++.dylib" />
 
   </platform>
 
