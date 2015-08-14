@@ -1,25 +1,45 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!-- TODO comments, header -->
-<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android" id="com.brainrainsolutions.cordova.plugins.harmankardoncordovaplugin" version="0.0.1">
-	<name>Harman Kardon Cordova Plugin</name>
-	<description>Harman Kardon Cordova Plugin</description>
-	<license>MIT</license>
-	<keywords>cordova, plugin, harman, kardon, android, ios</keywords>
-	<repo>https://github.com/brainrainteam/harman-kardon-cordova.git</repo>
-	<issue>https://github.com/brainrainteam/harman-kardon-cordova/issues</issue>
+<?xml version="1.0" encoding="utf-8"?>
+<plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
+        id="com.example.hello"
+        version="0.7.0">
 
-	<js-module src="www/CordovaBoilerPlatePlugin.js" name="CordovaBoilerPlatePlugin">
-		<clobbers target="CordovaBoilerPlatePlugin" />
-	</js-module>
+  <name>Hello</name>
 
-	<!-- iOS -->
-	<platform name="ios">
-		<config-file target="config.xml" parent="/*">
-			<feature name="CordovaBoilerPlatePlugin">
-				<param name="ios-package" value="CordovaBoilerPlatePlugin"/>
-			</feature>
-		</config-file>
-		<header-file src="src/ios/CordovaBoilerPlatePlugin.h"/>
-		<source-file src="src/ios/CordovaBoilerPlatePlugin.m"/>
-	</platform>
+  <engines>
+    <engine name="cordova" version=">=3.4.0"/>
+  </engines>
+
+  <asset src="www/hello.js" target="js/hello.js"/>
+
+  <js-module src="www/hello.js" name="hello">
+    <clobbers target="hello" />
+  </js-module>
+
+  <platform name="android">
+
+    <config-file target="res/xml/config.xml" parent="/*">
+      <feature name="Hello">
+        <param name="android-package" value="com.example.plugin.Hello"/>
+      </feature>
+    </config-file>
+
+    <source-file src="src/android/Hello.java" target-dir="src/com/example/plugin/"/>
+  </platform>
+
+  <platform name="ios">
+    
+    <config-file target="config.xml" parent="/widget">
+      <feature name="Hello">
+        <param name="ios-package" value="HWPHello" />
+      </feature>
+    </config-file>
+
+    <header-file src="src/ios/HWPHello.h" target-dir="HelloPlugin"/>
+    <source-file src="src/ios/HWPHello.m" target-dir="HelloPlugin"/>
+  </platform>
+
+  <platform name="wp7">
+    <source-file src="src/wp7/Hello.cs"/>
+  </platform>
+
 </plugin>
