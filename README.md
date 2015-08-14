@@ -9,3 +9,7 @@ HKAudio - A Harman Kardon Cordova plugin for Harman Kardon SDK
 This requires cordova 5.0+ ( current stable 1.0.0 )
 
      cordova plugin add https://github.com/brainrainteam/harman-kardon-cordova
+
+
+## Remove Plugin
+     cordova plugin add https://github.com/brainrainteam/harman-kardon-cordova.git
