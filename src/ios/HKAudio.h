@@ -1,6 +1,6 @@
 #import <Cordova/CDV.h>
+#import "GlobalContraints.h"
 #import "HKWControlHandler.h"
-#import "GlobalConstraints.h"
 #import "HKWDeviceEventHandlerSingleton.h"
 #import "HKWPlayerEventHandlerSingleton.h"
 
