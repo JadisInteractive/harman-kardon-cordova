@@ -1,6 +1,11 @@
-cordovaboilerplateplugin
-========================
+Harman Kardon Cordova
+=========================================
 
-Cordova Plugin Boilerplate
+A Harman Kardon Cordova plugin for Harman Kardon SDK
 
-TODO: Complete README.md
+
+## Installation
+
+This requires cordova 5.0+ ( current stable 1.0.0 )
+
+     cordova plugin add https://github.com/brainrainteam/harman-kardon-cordova

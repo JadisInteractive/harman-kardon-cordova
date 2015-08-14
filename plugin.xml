@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- TODO comments, header -->
-<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android" id="org.crudworks.cordova.plugins.cordovaboilerplateplugin" version="0.0.1">
-	<name>CordovaBoilerPlatePlugin</name>
-	<description>Cordova Boiler Plate Plugin</description>
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android" id="com.brainrainsolutions.cordova.plugins.harmankardoncordovaplugin" version="0.0.1">
+	<name>Harman Kardon Cordova Plugin</name>
+	<description>Harman Kardon Cordova Plugin</description>
 	<license>MIT</license>
-	<keywords>cordova, plugin, boilerplate, android, ios</keywords>
-	<repo>https://github.com/simonprickett/cordovaboilerplateplugin.git</repo>
-	<issue>https://github.com/simonprickett/cordovaboilerplateplugin/issues</issue>
+	<keywords>cordova, plugin, harman, kardon, android, ios</keywords>
+	<repo>https://github.com/brainrainteam/harman-kardon-cordova.git</repo>
+	<issue>https://github.com/brainrainteam/harman-kardon-cordova/issues</issue>
 
 	<js-module src="www/CordovaBoilerPlatePlugin.js" name="CordovaBoilerPlatePlugin">
 		<clobbers target="CordovaBoilerPlatePlugin" />
@@ -21,15 +21,5 @@
 		</config-file>
 		<header-file src="src/ios/CordovaBoilerPlatePlugin.h"/>
 		<source-file src="src/ios/CordovaBoilerPlatePlugin.m"/>
-	</platform>
-
-	<!-- Android -->
-	<platform name="android">
-		<config-file target="res/xml/config.xml" parent="/*">
-			<feature name="CordovaBoilerPlatePlugin">
-				<param name="android-package" value="org.crudworks.cordova.plugins.CordovaBoilerPlatePlugin"/>
-			</feature>
-		</config-file>
-		<source-file src="src/android/org/crudworks/cordova/plugins/CordovaBoilerPlatePlugin.java" target-dir="src/org/crudworks/cordova/plugins/"/>
 	</platform>
 </plugin>
