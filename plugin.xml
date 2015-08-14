@@ -24,14 +24,16 @@
     </config-file>
 
     <header-file src="src/ios/HKAudio.h" target-dir="HKAudioPlugin"/>
+    <header-file src="src/ios/GlobalContraints.h" target-dir="HKAudioPlugin"/>
     <source-file src="src/ios/HKAudio.m" target-dir="HKAudioPlugin"/>
 
-   <source-file src="src/ios/HKWirelessHDSDK/lib/libHKWirelessHD.a" framework="true"/>
-   <header-file src="src/ios/HKWirelessHDSDK/include/DeviceGroup.h" />
-   <header-file src="src/ios/HKWirelessHDSDK/include/DeviceInfo.h" />
-   <header-file src="src/ios/HKWirelessHDSDK/include/HKWControlHandler.h" />
-   <header-file src="src/ios/HKWirelessHDSDK/include/HKWDeviceEventHandlerSingleton.h" />
-   <header-file src="src/ios/HKWirelessHDSDK/include/HKWPlayerEventHandlerSingleton.h" />
+
+   <source-file src="src/ios/HKWirelessHDSDK/lib/libHKWirelessHD.a" framework="true" target-dir="HKAudioPlugin"/>
+   <header-file src="src/ios/HKWirelessHDSDK/include/DeviceGroup.h" target-dir="HKAudioPlugin"/>
+   <header-file src="src/ios/HKWirelessHDSDK/include/DeviceInfo.h" target-dir="HKAudioPlugin" />
+   <header-file src="src/ios/HKWirelessHDSDK/include/HKWControlHandler.h" target-dir="HKAudioPlugin" />
+   <header-file src="src/ios/HKWirelessHDSDK/include/HKWDeviceEventHandlerSingleton.h" target-dir="HKAudioPlugin" />
+   <header-file src="src/ios/HKWirelessHDSDK/include/HKWPlayerEventHandlerSingleton.h" target-dir="HKAudioPlugin"/>
    <framework src="libbz2.dylib" />
    <framework src="libz.dylib" />
    <framework src="libstdc++.dylib" />
