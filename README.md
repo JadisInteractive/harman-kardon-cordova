@@ -13,3 +13,7 @@ This requires cordova 5.0+ ( current stable 1.0.0 )
 
 ## Remove Plugin
      cordova plugin rm com.brainrainsolutions.hkaudio
+
+
+## Notes to mention to HK
+

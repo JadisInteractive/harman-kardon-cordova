@@ -25,6 +25,13 @@
 
     <header-file src="src/ios/HKAudio.h" target-dir="HKAudioPlugin"/>
     <source-file src="src/ios/HKAudio.m" target-dir="HKAudioPlugin"/>
+
+   <source-file src="src/ios/HKWirelessHDSDK/lib/libHKWirelessHD.a" framework="true" />
+   <header-file src="src/ios/HKWirelessHDSDK/include/DeviceGroup.h" />
+   <header-file src="src/ios/HKWirelessHDSDK/include/DeviceInfo.h" />
+   <header-file src="src/ios/HKWirelessHDSDK/include/HKWControlHandler.h" />
+   <header-file src="src/ios/HKWirelessHDSDK/include/HKWDeviceEventHandlerSingleton.h" />
+   <header-file src="src/ios/HKWirelessHDSDK/include/HKWPlayerEventHandlerSingleton.h" />
   </platform>
 
 </plugin>
