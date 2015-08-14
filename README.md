@@ -1,7 +1,7 @@
-Harman Kardon Cordova
+HKAudio - A Harman Kardon Cordova Plugin
 =========================================
 
-A Harman Kardon Cordova plugin for Harman Kardon SDK
+HKAudio - A Harman Kardon Cordova plugin for Harman Kardon SDK
 
 
 ## Installation

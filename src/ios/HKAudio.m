@@ -1,6 +1,6 @@
-#import "HWPHello.h"
+#import "HKAudio.h"
 
-@implementation HWPHello
+@implementation HKAudio
 
 - (void)greet:(CDVInvokedUrlCommand*)command
 {
@@ -15,5 +15,6 @@
 
     [self success:result callbackId:callbackId];
 }
+
 
 @end
