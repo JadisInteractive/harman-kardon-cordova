@@ -16,4 +16,5 @@ This requires cordova 5.0+ ( current stable 1.0.0 )
 
 
 ## Notes to mention to HK
-
+* We would like getting started docs and sample code for objective c.
+* For easy accessibility, a download SDK link could be in sidebar so that it shows on every page, not just homepage.
