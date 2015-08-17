@@ -10,6 +10,7 @@ This requires cordova 5.0+ ( current stable 1.0.0 )
 
      cordova plugin add https://github.com/brainrainteam/harman-kardon-cordova
 
+Change the deployment target in xcode to be 8.4. Otherwise you may get linking errors. 
 
 ## Remove Plugin
      cordova plugin rm com.brainrainsolutions.hkaudio
