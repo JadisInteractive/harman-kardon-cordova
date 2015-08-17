@@ -17,11 +17,11 @@ cordova.define("com.brainrainsolutions.hkaudio.hkaudio", function(require, expor
         getActiveDeviceCount: function (successCallback, errorCallback) {
             cordova.exec(successCallback, errorCallback, "HKAudio", "getActiveDeviceCount");
         },
-         removeDeviceFromSession: function (successCallback, errorCallback) {
-            cordova.exec(successCallback, errorCallback, "HKAudio", "removeDeviceFromSession");
+         removeDeviceFromSession: function (successCallback, errorCallback, deviceId) {
+            cordova.exec(successCallback, errorCallback, "HKAudio", "removeDeviceFromSession", [deviceId]);
         },
-         addDeviceToSession: function (successCallback, errorCallback) {
-            cordova.exec(successCallback, errorCallback, "HKAudio", "addDeviceToSession");
+         addDeviceToSession: function (successCallback, errorCallback, deviceId) {
+            cordova.exec(successCallback, errorCallback, "HKAudio", "addDeviceToSession", [deviceId]);
         },
         getDeviceCount: function (successCallback, errorCallback) {
             cordova.exec(successCallback, errorCallback, "HKAudio", "getDeviceCount");
