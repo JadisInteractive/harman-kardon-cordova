@@ -18,8 +18,8 @@
   <platform name="ios">
 
     <config-file target="config.xml" parent="/widget">
-      <feature name="HKAudio">
-        <param name="ios-package" value="HKAudio" />
+      <feature name="hkaudio">
+        <param name="ios-package" value="hkaudio" />
       </feature>
     </config-file>
 
