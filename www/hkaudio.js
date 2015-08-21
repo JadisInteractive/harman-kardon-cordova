@@ -1,4 +1,4 @@
-cordova.define("com.brainrainsolutions.hkaudio.hkaudio", function(require, exports, module) { /*global cordova, module*/
+cordova.define("com.jadisinteractive.hkaudio.hkaudio", function(require, exports, module) { /*global cordova, module*/
 
 
     module.exports = {
