@@ -11,7 +11,7 @@
 
   <asset src="www/hkaudio.js" target="js/hkaudio.js"/>
 
-  <js-module src="www/hkaudio.js" name="hkaudio">
+  <js-module src="www/hkaudio.js" name="HKAudio">
     <clobbers target="hkaudio" />
   </js-module>
 
