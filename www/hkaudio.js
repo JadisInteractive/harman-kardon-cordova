@@ -1,5 +1,3 @@
-/* cordova.define("com.jadisinteractive.hkaudio.hkaudio", function(require, exports, module) { */ /*global cordova, module*/
-
 
     module.exports = {
         initialize: function (successCallback, errorCallback) {
@@ -51,5 +49,3 @@
         }
 
     };
-/* }); */
-
