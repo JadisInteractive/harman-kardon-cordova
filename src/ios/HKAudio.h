@@ -1,3 +1,4 @@
+#import <Cordova/CDVPlugin.h>
 #import <Cordova/CDV.h>
 #import "HKWControlHandler.h"
 #import "GlobalContraints.h"
