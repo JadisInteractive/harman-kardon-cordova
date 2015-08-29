@@ -16,7 +16,65 @@ Change the deployment target in xcode to be 8.4. Otherwise you may get linking e
      cordova plugin rm com.jadisinteractive.hkaudio
 
 ## Usage
-hkaudio.initialize(success, error)
+```javascript
+hkaudio.initialize(success, error);
+```
+This initializes the HK Wireless HD SDK.
++ **success:** Callback function if the SDK is successfully initialized and ready for use
++ **error:** Callback function if there was an error trying to initialze the SDK
+
+```javascript
+hkaudio.startRefreshDeviceInfo(success, error);
+```
+
+```javascript
+hkaudio.stopRefreshDeviceInfo(success, error);
+```
+
+```javascript
+hkaudio.getGroupCount(success, error);
+```
+
+```javascript
+hkaudio.getActiveDeviceCount(success, error);
+```
+
+```javascript
+hkaudio.removeDeviceFromSession(success, error, deviceId);
+```
+
+```javascript
+hkaudio.addDeviceToSession(success, error, deviceId);
+```
+
+```javascript
+hkaudio.getDeviceCount(success, error);
+```
+
+```javascript
+hkaudio.isPlaying(success, error);
+```
+
+```javascript
+hkaudio.playCAF(success, error, URL, songName, resumeFlag);
+```
+
+```javascript
+hkaudio.stop(success, error);
+```
+
+```javascript
+hkaudio.pause(success, error);
+```
+
+```javascript
+hkaudio.setVolume(success, error, volume);
+```
+
+```javascript
+hkaudio.mute(success, error);
+```
+
 
 ## Notes to mention to HK
 * We would like getting started docs and sample code for objective c.
