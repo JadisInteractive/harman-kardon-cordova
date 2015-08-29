@@ -15,6 +15,8 @@ Change the deployment target in xcode to be 8.4. Otherwise you may get linking e
 ## Remove Plugin
      cordova plugin rm com.jadisinteractive.hkaudio
 
+## Usage
+hkaudio.initialize(success, error)
 
 ## Notes to mention to HK
 * We would like getting started docs and sample code for objective c.
