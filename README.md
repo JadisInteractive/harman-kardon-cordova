@@ -92,20 +92,33 @@ This method plays a CAF audio file in local storage.
 ```javascript
 hkaudio.stop(success, error);
 ```
+This method stops the current playback.
++ **success:** Callback function
++ **error:** Callback function
 
 ```javascript
 hkaudio.pause(success, error);
 ```
+This method pauses the current playback.
++ **success:** Callback function
++ **error:** Callback function
 
 ```javascript
 hkaudio.setVolume(success, error, volume);
 ```
+This method sets a volume level to all speakers. The same volume level is set to all speakers. The range is 0 to 50.
++ **success:** Callback function
++ **error:** Callback function
++ **volume:** Integer
 
 ```javascript
 hkaudio.mute(success, error);
 ```
+This method mutes the current volume of all speakers.
++ **success:** Callback function
++ **error:** Callback function
 
 
 ## Notes to mention to HK
-* We would like getting started docs and sample code for Objective-C.
+* We would like getting started docs and sample code for Objective-C along with Swift.
 * For easy accessibility, a download SDK link could be in sidebar so that it shows on every page, not just homepage.
