@@ -6,9 +6,6 @@
 {
 
     self.callbackId = [command callbackId];
-    // NSString* callbackId = [command callbackId];
-    //  NSString* name = [[command arguments] objectAtIndex:0];
-    //  NSString* msg = [NSString stringWithFormat: @"Hello, %@", name];
     NSString* msg = [NSString stringWithFormat: @"success"];
 
 
@@ -335,8 +332,7 @@
     }
 }
 
-/* Get the current device info.
- */
+/* Get the current device info. */
 - (NSDictionary*)getDeviceInfo:(long long)deviceId
 {
 
