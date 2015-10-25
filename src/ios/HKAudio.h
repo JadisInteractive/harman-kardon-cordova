@@ -11,14 +11,13 @@
 
 //Cordova Methods
 - (void) start:(CDVInvokedUrlCommand*)command;
-- (void) getActiveDeviceCount:(CDVInvokedUrlCommand*)command;
 
 //Refreshing Speaker Information
 - (void) startRefreshDeviceInfo:(CDVInvokedUrlCommand*)command;
 - (void) stopRefreshDeviceInfo:(CDVInvokedUrlCommand*)command;
 
 //Playback Control
-- (void)playCAF:(CDVInvokedUrlCommand*)command;
+- (void) playCAF:(CDVInvokedUrlCommand*)command;
 - (void) isPlaying:(CDVInvokedUrlCommand*)command;
 - (void) stop:(CDVInvokedUrlCommand*)command;
 - (void) pause:(CDVInvokedUrlCommand*)command;
@@ -30,6 +29,8 @@
 - (void) removeDeviceFromSession:(CDVInvokedUrlCommand*)command;
 - (void) addDeviceToSession:(CDVInvokedUrlCommand*)command;
 - (void) getDeviceCount:(CDVInvokedUrlCommand*)command;
+- (void) getActiveDeviceCount:(CDVInvokedUrlCommand*)command;
+
 
 //Methods
 - (void) initializeHKWController;

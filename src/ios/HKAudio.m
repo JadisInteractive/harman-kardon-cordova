@@ -98,7 +98,6 @@
 #pragma mark - Playback Control Functions
 
 
-
 - (void)playCAF:(CDVInvokedUrlCommand*)command
 {
     NSLog(@"%@", NSStringFromSelector(_cmd));
@@ -294,7 +293,7 @@
 
 #pragma mark - HKWController Helper Functions
 
--(void)  initializeHKWController {
+-(void)initializeHKWController {
 
     if (![[HKWControlHandler sharedInstance] initializing] && ![[HKWControlHandler sharedInstance] isInitialized] ) {
         dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
