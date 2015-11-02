@@ -2,6 +2,9 @@
 
 @implementation HKAudio
 
+// ===============================================================
+#pragma mark - SDK Initialization
+
 - (void)start:(CDVInvokedUrlCommand*)command
 {
 
@@ -23,7 +26,7 @@
     }
     else
     {
-        NSLog(@"hkwController is initializesd");
+        NSLog(@"hkwController is initialized");
     }
 
     [self initializeHKWController];
@@ -38,29 +41,41 @@
 
 }
 
+-(void)initializeHKWController {
 
+    if (![[HKWControlHandler sharedInstance] initializing] && ![[HKWControlHandler sharedInstance] isInitialized] ) {
+        dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
+            //Background Thread
+            if ([[HKWControlHandler sharedInstance] initializeHKWirelessController:[NSString stringWithFormat:@"%s" , kLicenseKeyGlobal] withSpeakersAdded:false ] != 0)
+            {
+                NSLog(@"initializeHKWirelessControl failed : invalid license key");
+                return;
+            }
 
-- (void)getActiveDeviceCount:(CDVInvokedUrlCommand*)command
-{
+            NSLog(@"initializeHKWirelessControl - OK");
+            [HKWDeviceEventHandlerSingleton sharedInstance].delegate = self;
 
-    NSLog(@"%@", NSStringFromSelector(_cmd));
+            // dismiss the network initialization dialog
+            if (self.alertInitializing != nil) {
+                [self.alertInitializing dismissViewControllerAnimated:true completion: nil];
+            }
 
-    NSString* callbackId = [command callbackId];
-    NSInteger deviceCount = [[HKWControlHandler sharedInstance] getActiveDeviceCount];
-    NSString* msg = [NSString stringWithFormat: @"%d", deviceCount];
+            dispatch_async(dispatch_get_main_queue(), ^(void){
+                //Run UI Updates
+            });
+        });
 
-
-    CDVPluginResult* result = [CDVPluginResult
-
-                               resultWithStatus:CDVCommandStatus_OK
-                               messageAsString:msg];
-
-    [self.commandDelegate sendPluginResult:result callbackId:callbackId];
-
-
+    }
 }
 
+
+// ===============================================================
 #pragma mark - Refreshing Speaker Information
+
+- (void)refreshDeviceInfoOnce:(CDVInvokedUrlCommand*)command
+{
+
+}
 
 - (void)startRefreshDeviceInfo:(CDVInvokedUrlCommand*)command
 {
@@ -95,8 +110,9 @@
     [self.commandDelegate sendPluginResult:result callbackId:callbackId];
 }
 
-#pragma mark - Playback Control Functions
 
+// ===============================================================
+#pragma mark - Playback Control
 
 - (void)playCAF:(CDVInvokedUrlCommand*)command
 {
@@ -118,8 +134,6 @@
 
     [self.commandDelegate sendPluginResult:result callbackId:callbackId];
 }
-
-
 
 - (void)isPlaying:(CDVInvokedUrlCommand*)command
 {
@@ -172,6 +186,46 @@
     [self.commandDelegate sendPluginResult:result callbackId:callbackId];
 }
 
+- (void)playCAFFromCertainTime:(CDVInvokedUrlCommand*)command
+{
+
+}
+
+- (void)playWAV:(CDVInvokedUrlCommand*)command
+{
+
+}
+
+- (void)playStreamingMedia:(CDVInvokedUrlCommand*)command
+{
+
+}
+
+- (void)getPlayerState:(CDVInvokedUrlCommand*)command
+{
+
+}
+
+
+// ===============================================================
+#pragma mark - Volume Control
+
+- (void)mute:(CDVInvokedUrlCommand*)command
+{
+    NSLog(@"%@", NSStringFromSelector(_cmd));
+
+    NSString* callbackId = [command callbackId];
+    [[HKWControlHandler sharedInstance]  mute];
+    NSString* msg = [NSString stringWithFormat: @"mute"];
+
+
+    CDVPluginResult* result = [CDVPluginResult
+
+                               resultWithStatus:CDVCommandStatus_OK
+                               messageAsString:msg];
+
+    [self.commandDelegate sendPluginResult:result callbackId:callbackId];
+}
 
 - (void)setVolume:(CDVInvokedUrlCommand*)command
 {
@@ -193,14 +247,48 @@
     [self.commandDelegate sendPluginResult:result callbackId:callbackId];
 }
 
-
-- (void)mute:(CDVInvokedUrlCommand*)command
+- (void)setVolumeDevice:(CDVInvokedUrlCommand*)command
 {
+
+}
+
+- (void)getVolume:(CDVInvokedUrlCommand*)command
+{
+
+}
+
+- (void)getDeviceVolume:(CDVInvokedUrlCommand*)command
+{
+
+}
+
+- (void)getMaximumVolumeLevel:(CDVInvokedUrlCommand*)command
+{
+
+}
+
+- (void)unmute:(CDVInvokedUrlCommand*)command
+{
+
+}
+
+- (void)isMuted:(CDVInvokedUrlCommand*)command
+{
+
+}
+
+
+// ===============================================================
+#pragma mark - Device (Speaker) Management
+
+- (void)getActiveDeviceCount:(CDVInvokedUrlCommand*)command
+{
+
     NSLog(@"%@", NSStringFromSelector(_cmd));
 
     NSString* callbackId = [command callbackId];
-    [[HKWControlHandler sharedInstance]  mute];
-    NSString* msg = [NSString stringWithFormat: @"mute"];
+    NSInteger deviceCount = [[HKWControlHandler sharedInstance] getActiveDeviceCount];
+    NSString* msg = [NSString stringWithFormat: @"%d", deviceCount];
 
 
     CDVPluginResult* result = [CDVPluginResult
@@ -209,10 +297,9 @@
                                messageAsString:msg];
 
     [self.commandDelegate sendPluginResult:result callbackId:callbackId];
+
+
 }
-
-
-#pragma mark - Device (Speaker) Management Functions
 
 - (void)getGroupCount:(CDVInvokedUrlCommand*)command
 {
@@ -248,8 +335,6 @@
     [self.commandDelegate sendPluginResult:result callbackId:callbackId];
 }
 
-
-
 - (void)addDeviceToSession:(CDVInvokedUrlCommand*)command
 {
     NSLog(@"%@", NSStringFromSelector(_cmd));
@@ -267,7 +352,6 @@
 
     [self.commandDelegate sendPluginResult:result callbackId:callbackId];
 }
-
 
 - (void)removeDeviceFromSession:(CDVInvokedUrlCommand*)command
 {
@@ -287,38 +371,148 @@
     [self.commandDelegate sendPluginResult:result callbackId:callbackId];
 }
 
+- (void)getDeviceCountInGroupIndex:(CDVInvokedUrlCommand*)command
+{
 
-
-
-
-#pragma mark - HKWController Helper Functions
-
--(void)initializeHKWController {
-
-    if (![[HKWControlHandler sharedInstance] initializing] && ![[HKWControlHandler sharedInstance] isInitialized] ) {
-        dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
-            //Background Thread
-            if ([[HKWControlHandler sharedInstance] initializeHKWirelessController:[NSString stringWithFormat:@"%s" , kLicenseKeyGlobal] withSpeakersAdded:false ] != 0)
-            {
-                NSLog(@"initializeHKWirelessControl failed : invalid license key");
-                return;
-            }
-
-            NSLog(@"initializeHKWirelessControl - OK");
-            [HKWDeviceEventHandlerSingleton sharedInstance].delegate = self;
-
-            // dismiss the network initialization dialog
-            if (self.alertInitializing != nil) {
-                [self.alertInitializing dismissViewControllerAnimated:true completion: nil];
-            }
-
-            dispatch_async(dispatch_get_main_queue(), ^(void){
-                //Run UI Updates
-            });
-        });
-
-    }
 }
+
+- (void)getDeviceInfoByGroupIndexAndDeviceIndex:(CDVInvokedUrlCommand*)command
+{
+
+}
+
+- (void)getDeviceInfoByIndex:(CDVInvokedUrlCommand*)command
+{
+
+}
+
+- (void)getDeviceGroupByDeviceId:(CDVInvokedUrlCommand*)command
+{
+
+}
+
+- (void)getDeviceInfoById:(CDVInvokedUrlCommand*)command
+{
+
+}
+
+- (void)isDeviceAvailable:(CDVInvokedUrlCommand*)command
+{
+
+}
+
+- (void)isDeviceActive:(CDVInvokedUrlCommand*)command
+{
+
+}
+
+- (void)removeDeviceFromGroup:(CDVInvokedUrlCommand*)command
+{
+
+}
+
+- (void)getDeviceGroupByIndex:(CDVInvokedUrlCommand*)command
+{
+
+}
+
+- (void)getDeviceGroupByGroupId:(CDVInvokedUrlCommand*)command
+{
+
+}
+
+- (void)getDeviceGroupNameByIndex:(CDVInvokedUrlCommand*)command
+{
+
+}
+
+- (void)getDeviceGroupIdByIndex:(CDVInvokedUrlCommand*)command
+{
+
+}
+
+- (void)setDeviceName:(CDVInvokedUrlCommand*)command
+{
+
+}
+
+- (void)setDeviceGroupName:(CDVInvokedUrlCommand*)command
+{
+
+}
+
+- (void)setDeviceRole:(CDVInvokedUrlCommand*)command
+{
+
+}
+
+- (void)getActiveGroupCount:(CDVInvokedUrlCommand*)command
+{
+
+}
+
+- (void)refreshDeviceWiFiSignal:(CDVInvokedUrlCommand*)command
+{
+
+}
+
+- (void)getWifiSignalStrengthType:(CDVInvokedUrlCommand*)command
+{
+
+}
+
+
+// ===============================================================
+#pragma mark - HKWDeviceEventHandlerSingleton
+
+
+// ===============================================================
+#pragma mark - HKWDeviceEventHandlerDelegate
+
+-(void)hkwDeviceStateUpdated:(long long)deviceId withReason:(NSInteger)reason{
+
+    NSInteger activeDeviceCount  = [[HKWControlHandler sharedInstance] getActiveDeviceCount];
+    NSInteger groupCount         = [[HKWControlHandler sharedInstance] getGroupCount];
+    NSString *groupName          = [[HKWControlHandler sharedInstance] getDeviceGroupNameByIndex:0];
+    NSInteger deviceCount        = [[HKWControlHandler sharedInstance] getDeviceCountInGroupIndex:0];
+    DeviceInfo *deviceInfo       = [[HKWControlHandler sharedInstance] getDeviceInfoByGroupIndexAndDeviceIndex:0 deviceIndex:0];
+
+    NSLog(@"%@ deviceId: %lld", NSStringFromSelector(_cmd), deviceId);
+    NSLog(@"Active device count: %d", activeDeviceCount);
+    NSLog(@"Group count: %d", groupCount);
+    NSLog(@"Group Name: %@", groupName);
+    NSLog(@"Device Count: %d",  deviceCount);
+    NSLog(@"Device Info IP: %@",  deviceInfo.ipAddress);
+    NSLog(@"Device Info Name: %@",  deviceInfo.deviceName);
+
+    //Add Device to Session (select device)
+    // [[HKWControlHandler sharedInstance] addDeviceToSession:deviceInfo.deviceId];
+
+    //Remove Device from Session (select device)
+    // [[HKWControlHandler sharedInstance] removeDeviceFromSession:deviceInfo.deviceId];
+
+    [self updateDeviceStatus:deviceId];
+}
+
+
+-(void)hkwErrorOccurred:(NSInteger)errorCode withErrorMessage:(NSString*)errorMesg{
+    NSLog(@"%@: %@", NSStringFromSelector(_cmd), errorMesg);
+
+}
+
+
+// ===============================================================
+#pragma mark - HKWPlayerEventHandlerSingleton
+
+
+// ===============================================================
+#pragma mark - HKWPlayerEventHandlerDelegate
+-(void)hkwPlayEnded{
+
+}
+
+// ===============================================================
+#pragma mark - Helper Functions
 
 - (void)updateDeviceStatus:(long long)deviceId
 {
@@ -355,7 +549,7 @@
     [deviceData setObject:currentDevice.groupName forKey:@"groupName"];
     /*! The model name of the speaker */
     [deviceData setObject:currentDevice.modelName forKey:@"modelName"];
-    /*! The zone name of the speaker. The zone name is used for representing group ID and group name in a single string, separated by '#&#' */
+    /*! The zone name of the speaker. The ZN is used for representing group ID & group name in a single string, separated by '#&#' */
     [deviceData setObject:currentDevice.zoneName forKey:@"zoneName"];
     /*! The current volume level of the speaker */
     [deviceData setObject:[NSNumber numberWithInteger:currentDevice.volume] forKey:@"volume"];
@@ -380,9 +574,7 @@
 }
 
 
-
-/* Get the current Group info.
- */
+/* Get the current Group info. */
 - (NSDictionary*)getGroupInfo:(long long)deviceId
 {
     DeviceGroup* currentGroup = [[HKWControlHandler sharedInstance] getDeviceGroupByDeviceId:deviceId];
@@ -403,45 +595,12 @@
     return groupData;
 }
 
-#pragma mark - HKWDeviceEventHandler Delegate
 
--(void)hkwDeviceStateUpdated:(long long)deviceId withReason:(NSInteger)reason{
-
-    NSInteger activeDeviceCount  = [[HKWControlHandler sharedInstance] getActiveDeviceCount];
-    NSInteger groupCount         = [[HKWControlHandler sharedInstance] getGroupCount];
-    NSString *groupName          = [[HKWControlHandler sharedInstance] getDeviceGroupNameByIndex:0];
-    NSInteger deviceCount        = [[HKWControlHandler sharedInstance] getDeviceCountInGroupIndex:0];
-    DeviceInfo *deviceInfo       = [[HKWControlHandler sharedInstance] getDeviceInfoByGroupIndexAndDeviceIndex:0 deviceIndex:0];
-
-    NSLog(@"%@ deviceId: %lld", NSStringFromSelector(_cmd), deviceId);
-    NSLog(@"Active device count: %d", activeDeviceCount);
-    NSLog(@"Group count: %d", groupCount);
-    NSLog(@"Group Name: %@", groupName);
-    NSLog(@"Device Count: %d",  deviceCount);
-    NSLog(@"Device Info IP: %@",  deviceInfo.ipAddress);
-    NSLog(@"Device Info Name: %@",  deviceInfo.deviceName);
-
-    //Add Device to Session (select device)
-    // [[HKWControlHandler sharedInstance] addDeviceToSession:deviceInfo.deviceId];
-
-    //Remove Device from Session (select device)
-    // [[HKWControlHandler sharedInstance] removeDeviceFromSession:deviceInfo.deviceId];
-
-    [self updateDeviceStatus:deviceId];
-}
-
-
--(void)hkwErrorOccurred:(NSInteger)errorCode withErrorMessage:(NSString*)errorMesg{
-    NSLog(@"%@: %@", NSStringFromSelector(_cmd), errorMesg);
-
-}
-
-#pragma mark -  HKWPlayerEventHandlerDelegate Delegate
-
-
--(void)hkwPlayEnded{
-
-}
+// ---------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------
 
 
 @end
