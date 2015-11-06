@@ -2,6 +2,9 @@
 
 @implementation HKAudio
 
+// ===============================================================
+#pragma mark - SDK Initialization
+
 - (void)start:(CDVInvokedUrlCommand*)command
 {
 
@@ -23,7 +26,7 @@
     }
     else
     {
-        NSLog(@"hkwController is initializesd");
+        NSLog(@"hkwController is initialized");
     }
 
     [self initializeHKWController];
@@ -38,29 +41,52 @@
 
 }
 
+-(void)initializeHKWController {
+
+    if (![[HKWControlHandler sharedInstance] initializing] && ![[HKWControlHandler sharedInstance] isInitialized] ) {
+        dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
+            //Background Thread
+            if ([[HKWControlHandler sharedInstance] initializeHKWirelessController:[NSString stringWithFormat:@"%s" , kLicenseKeyGlobal] withSpeakersAdded:false ] != 0)
+            {
+                NSLog(@"initializeHKWirelessControl failed : invalid license key");
+                return;
+            }
+
+            NSLog(@"initializeHKWirelessControl - OK");
+            [HKWDeviceEventHandlerSingleton sharedInstance].delegate = self;
+
+            // dismiss the network initialization dialog
+            if (self.alertInitializing != nil) {
+                [self.alertInitializing dismissViewControllerAnimated:true completion: nil];
+            }
+
+            dispatch_async(dispatch_get_main_queue(), ^(void){
+                //Run UI Updates
+            });
+        });
+
+    }
+}
 
 
-- (void)getActiveDeviceCount:(CDVInvokedUrlCommand*)command
+// ===============================================================
+#pragma mark - Refreshing Speaker Information
+
+- (void)refreshDeviceInfoOnce:(CDVInvokedUrlCommand*)command
 {
-
     NSLog(@"%@", NSStringFromSelector(_cmd));
-
     NSString* callbackId = [command callbackId];
-    NSInteger deviceCount = [[HKWControlHandler sharedInstance] getActiveDeviceCount];
-    NSString* msg = [NSString stringWithFormat: @"%d", deviceCount];
+    NSString* msg = [NSString stringWithFormat: @"Refreshing device status one time."];
 
+    [[HKWControlHandler sharedInstance] refreshDeviceInfoOnce];
 
     CDVPluginResult* result = [CDVPluginResult
 
-                               resultWithStatus:CDVCommandStatus_OK
-                               messageAsString:msg];
+                                resultWithStatus:CDVCommandStatus_OK
+                                messageAsString:msg];
 
-    [self.commandDelegate sendPluginResult:result callbackId:callbackId];
-
-
+    [self.commandDelegate sendPluginResult:result callbackId: callbackId];
 }
-
-#pragma mark - Refreshing Speaker Information
 
 - (void)startRefreshDeviceInfo:(CDVInvokedUrlCommand*)command
 {
@@ -68,7 +94,7 @@
     NSString* callbackId = [command callbackId];
     NSString* msg = [NSString stringWithFormat: @"continuous refreshing started. refreshes every two seconds."];
 
-    [[HKWControlHandler sharedInstance] startRefreshDeviceInfo];
+    [[0 sharedInstance] startRefreshDeviceInfo];
 
     CDVPluginResult* result = [CDVPluginResult
 
@@ -95,9 +121,9 @@
     [self.commandDelegate sendPluginResult:result callbackId:callbackId];
 }
 
-#pragma mark - Playback Control Functions
 
-
+// ===============================================================
+#pragma mark - Playback Control
 
 - (void)playCAF:(CDVInvokedUrlCommand*)command
 {
@@ -119,8 +145,6 @@
 
     [self.commandDelegate sendPluginResult:result callbackId:callbackId];
 }
-
-
 
 - (void)isPlaying:(CDVInvokedUrlCommand*)command
 {
@@ -173,18 +197,71 @@
     [self.commandDelegate sendPluginResult:result callbackId:callbackId];
 }
 
+- (void)playCAFFromCertainTime:(CDVInvokedUrlCommand*)command
+{
+    NSString* urlString = (NSString *)[command argumentAtIndex:0];
+    NSString* songName = (NSString *)[command argumentAtIndex:1];
+    NSInteger startTime = (NSInteger)[command argumentAtIndex:2];
 
-- (void)setVolume:(CDVInvokedUrlCommand*)command
+    NSString* callbackId = [command callbackId];
+
+    BOOL success = [[HKWControlHandler sharedInstance] playCAFFromCertainTime:[NSURL URLWithString:[urlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]] songName:songName startTime:startTime];
+
+    NSString* msg = [NSString stringWithFormat: @"%d", success];
+
+    CDVPluginResult* result = [CDVPluginResult
+
+                               resultWithStatus:CDVCommandStatus_OK
+                               messageAsString:msg];
+
+    [self.commandDelegate sendPluginResult:result callbackId:callbackId];
+
+}
+
+- (void)playWAV:(CDVInvokedUrlCommand*)command
+{
+    NSString* soundFilePath = (NSString *)[command argumentAtIndex:0];
+
+    NSString* callbackId = [command callbackId];
+
+    BOOL success = [[HKWControlHandler sharedInstance] playWAV:[NSURL URLWithString:[soundFilePath stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
+
+    NSString* msg = [NSString stringWithFormat: @"%d", success];
+
+    CDVPluginResult* result = [CDVPluginResult
+
+                                resultWithStatus:CDVCommandStatus_OK
+                                messageAsString:msg];
+
+    [self.commandDelegate sendPluginResult:result callbackId:callbackId];
+}
+
+- (void)playStreamingMedia:(CDVInvokedUrlCommand*)command
+{
+    NSString* streamingMediaUrl = (NSString *)[command argumentAtIndex:0];
+
+    NSString* callbackId = [command callbackId];
+
+    BOOL success = [[HKWControlHandler sharedInstance] playStreamingMedia:[NSURL URLWithString:[streamingMediaUrl stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
+
+    NSString* msg = [NSString stringWithFormat: @"%d", success];
+
+    CDVPluginResult* result = [CDVPluginResult
+
+                                resultWithStatus:CDVCommandStatus_OK
+                                messageAsString:msg];
+
+    [self.commandDelegate sendPluginResult:result callbackId:callbackId];
+}
+
+- (void)getPlayerState:(CDVInvokedUrlCommand*)command
 {
     NSLog(@"%@", NSStringFromSelector(_cmd));
 
     NSString* callbackId = [command callbackId];
+    NSInteger getPlayerState = [[HKWControlHandler sharedInstance] getPlayerState];
+    NSString* msg = [NSString stringWithFormat: @"%d", getPlayerState];
 
-    id volume = [command argumentAtIndex:0];
-
-
-    [[HKWControlHandler sharedInstance]  setVolume:[volume integerValue]];
-    NSString* msg = [NSString stringWithFormat: @"stopped"];
 
     CDVPluginResult* result = [CDVPluginResult
 
@@ -195,12 +272,15 @@
 }
 
 
+// ===============================================================
+#pragma mark - Volume Control
+
 - (void)mute:(CDVInvokedUrlCommand*)command
 {
     NSLog(@"%@", NSStringFromSelector(_cmd));
 
     NSString* callbackId = [command callbackId];
-    [[HKWControlHandler sharedInstance]  mute];
+    [[HKWControlHandler sharedInstance] mute];
     NSString* msg = [NSString stringWithFormat: @"mute"];
 
 
@@ -212,8 +292,149 @@
     [self.commandDelegate sendPluginResult:result callbackId:callbackId];
 }
 
+- (void)setVolume:(CDVInvokedUrlCommand*)command
+{
+    NSLog(@"%@", NSStringFromSelector(_cmd));
 
-#pragma mark - Device (Speaker) Management Functions
+    NSString* callbackId = [command callbackId];
+
+    id volume = [command argumentAtIndex:0];
+
+
+    [[HKWControlHandler sharedInstance] setVolume:[volume integerValue]];
+    NSString* msg = [NSString stringWithFormat: @"stopped"];
+
+    CDVPluginResult* result = [CDVPluginResult
+
+                               resultWithStatus:CDVCommandStatus_OK
+                               messageAsString:msg];
+
+    [self.commandDelegate sendPluginResult:result callbackId:callbackId];
+}
+
+- (void)setVolumeDevice:(CDVInvokedUrlCommand*)command
+{
+    NSLog(@"%@", NSStringFromSelector(_cmd));
+
+    NSString* callbackId = [command callbackId];
+
+    id deviceId = [command argumentAtIndex:0];
+    id volume = [command argumentAtIndex:1];
+
+    NSString* callbackId = [command callbackId];
+
+    [[HKWControlHandler sharedInstance] setVolumeDevice:[volume integerValue]];
+
+    [self.commandDelegate sendPluginResult:result callbackId:callbackId];
+}
+
+- (void)getVolume:(CDVInvokedUrlCommand*)command
+{
+    NSLog(@"%@", NSStringFromSelector(_cmd));
+
+    NSString* callbackId = [command callbackId];
+
+    NSInteger getVolume = [[HKWControlHandler sharedInstance] getVolume];
+    NSString* msg = [NSString stringWithFormat: @"%d", getVolume];
+
+
+    CDVPluginResult* result = [CDVPluginResult
+
+                               resultWithStatus:CDVCommandStatus_OK
+                               messageAsString:msg];
+
+    [self.commandDelegate sendPluginResult:result callbackId:callbackId];
+
+}
+
+- (void)getDeviceVolume:(CDVInvokedUrlCommand*)command
+{
+    NSLog(@"%@", NSStringFromSelector(_cmd));
+
+    NSString* callbackId = [command callbackId];
+    NSInteger getDeviceVolume = [[HKWControlHandler sharedInstance] getDeviceVolume];
+    NSString* msg = [NSString stringWithFormat: @"%d", getMaximumVolumeLevel];
+
+
+    CDVPluginResult* result = [CDVPluginResult
+
+                               resultWithStatus:CDVCommandStatus_OK
+                               messageAsString:msg];
+
+    [self.commandDelegate sendPluginResult:result callbackId:callbackId];
+}
+
+- (void)getMaximumVolumeLevel:(CDVInvokedUrlCommand*)command
+{
+    NSLog(@"%@", NSStringFromSelector(_cmd));
+
+    NSString* callbackId = [command callbackId];
+    NSInteger getMaximumVolumeLevel = [[HKWControlHandler sharedInstance] getMaximumVolumeLevel];
+    NSString* msg = [NSString stringWithFormat: @"%d", getMaximumVolumeLevel];
+
+
+    CDVPluginResult* result = [CDVPluginResult
+
+                               resultWithStatus:CDVCommandStatus_OK
+                               messageAsString:msg];
+
+    [self.commandDelegate sendPluginResult:result callbackId:callbackId];
+}
+
+- (void)unmute:(CDVInvokedUrlCommand*)command
+{
+    NSLog(@"%@", NSStringFromSelector(_cmd));
+
+    NSString* callbackId = [command callbackId];
+    [[HKWControlHandler sharedInstance] unmute];
+    NSString* msg = [NSString stringWithFormat: @"unmute"];
+
+
+    CDVPluginResult* result = [CDVPluginResult
+
+                               resultWithStatus:CDVCommandStatus_OK
+                               messageAsString:msg];
+
+    [self.commandDelegate sendPluginResult:result callbackId:callbackId];
+}
+
+- (void)isMuted:(CDVInvokedUrlCommand*)command
+{
+    NSLog(@"%@", NSStringFromSelector(_cmd));
+
+    NSString* callbackId = [command callbackId];
+    BOOL isMuted = [[HKWControlHandler sharedInstance] isMuted];
+    NSString* msg = [NSString stringWithFormat: @"%d", isMuted];
+
+
+    CDVPluginResult* result = [CDVPluginResult
+
+                               resultWithStatus:CDVCommandStatus_OK
+                               messageAsString:msg];
+
+    [self.commandDelegate sendPluginResult:result callbackId:callbackId];
+}
+
+
+// ===============================================================
+#pragma mark - Device (Speaker) Management
+
+- (void)getActiveDeviceCount:(CDVInvokedUrlCommand*)command
+{
+    NSLog(@"%@", NSStringFromSelector(_cmd));
+
+    NSString* callbackId = [command callbackId];
+    NSInteger deviceCount = [[HKWControlHandler sharedInstance] getActiveDeviceCount];
+    NSString* msg = [NSString stringWithFormat: @"%d", deviceCount];
+
+
+    CDVPluginResult* result = [CDVPluginResult
+
+                               resultWithStatus:CDVCommandStatus_OK
+                               messageAsString:msg];
+
+    [self.commandDelegate sendPluginResult:result callbackId:callbackId];
+}
 
 - (void)getGroupCount:(CDVInvokedUrlCommand*)command
 {
@@ -249,8 +470,6 @@
     [self.commandDelegate sendPluginResult:result callbackId:callbackId];
 }
 
-
-
 - (void)addDeviceToSession:(CDVInvokedUrlCommand*)command
 {
     NSLog(@"%@", NSStringFromSelector(_cmd));
@@ -268,7 +487,6 @@
 
     [self.commandDelegate sendPluginResult:result callbackId:callbackId];
 }
-
 
 - (void)removeDeviceFromSession:(CDVInvokedUrlCommand*)command
 {
@@ -288,38 +506,413 @@
     [self.commandDelegate sendPluginResult:result callbackId:callbackId];
 }
 
+- (void)getDeviceCountInGroupIndex:(CDVInvokedUrlCommand*)command
+{
+    NSLog(@"%@", NSStringFromSelector(_cmd));
 
+    NSString* callbackId = [command callbackId];
 
+    NSInteger groupCount = [[HKWControlHandler sharedInstance] getGroupCount];
+    NSInteger groupIndex = groupCount - 1;
+    NSInteger deviceCount = [[HKWControlHandler sharedInstance] getDeviceCountInGroupIndex:(NSInteger)groupIndex];
+    NSString* msg = [NSString stringWithFormat: @"%d", deviceCount];
 
+    CDVPluginResult* result = [CDVPluginResult
 
-#pragma mark - HKWController Helper Functions
+                               resultWithStatus:CDVCommandStatus_OK
+                               messageAsString:msg];
 
--(void)  initializeHKWController {
-
-    if (![[HKWControlHandler sharedInstance] initializing] && ![[HKWControlHandler sharedInstance] isInitialized] ) {
-        dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
-            //Background Thread
-            if ([[HKWControlHandler sharedInstance] initializeHKWirelessController:[NSString stringWithFormat:@"%s" , kLicenseKeyGlobal] withSpeakersAdded:false ] != 0)
-            {
-                NSLog(@"initializeHKWirelessControl failed : invalid license key");
-                return;
-            }
-
-            NSLog(@"initializeHKWirelessControl - OK");
-            [HKWDeviceEventHandlerSingleton sharedInstance].delegate = self;
-
-            // dismiss the network initialization dialog
-            if (self.alertInitializing != nil) {
-                [self.alertInitializing dismissViewControllerAnimated:true completion: nil];
-            }
-
-            dispatch_async(dispatch_get_main_queue(), ^(void){
-                //Run UI Updates
-            });
-        });
-
-    }
+    [self.commandDelegate sendPluginResult:result callbackId:callbackId];
 }
+
+- (void)getDeviceInfoByGroupIndexAndDeviceIndex:(CDVInvokedUrlCommand*)command
+{
+    NSLog(@"%@", NSStringFromSelector(_cmd));
+
+    NSString* callbackId = [command callbackId];
+
+    NSInteger deviceCount = [[HKWControlHandler sharedInstance] getDeviceCount];
+    NSInteger groupCount = [[HKWControlHandler sharedInstance] getGroupCount];
+    NSInteger groupIndex = groupCount - 1;
+    NSInteger deviceIndex = deviceCount - 1;
+
+    DeviceInfo *deviceInfo = [[HKWControlHandler sharedInstance] getDeviceInfoByGroupIndexAndDeviceIndex:(NSInteger) groupIndex deviceIndex:(NSInteger) deviceIndex)];
+
+    NSString* msg = [NSString stringWithFormat: @"%d", *deviceInfo];
+
+    CDVPluginResult* result = [CDVPluginResult
+
+                               resultWithStatus:CDVCommandStatus_OK
+                               messageAsString:msg];
+
+    [self.commandDelegate sendPluginResult:result callbackId:callbackId];
+}
+
+- (void)getDeviceInfoByIndex:(CDVInvokedUrlCommand*)command
+{
+    NSLog(@"%@", NSStringFromSelector(_cmd));
+
+    NSString* callbackId = [command callbackId];
+
+    NSInteger deviceCount = [[HKWControlHandler sharedInstance] getDeviceCount];
+    NSInteger deviceIndex = deviceCount - 1;
+
+    DeviceInfo *deviceInfo = [[HKWControlHandler sharedInstance] getDeviceInfoByIndex:(NSInteger)deviceIndex)];
+
+    NSString* msg = [NSString stringWithFormat: @"%d", *deviceInfo];
+
+    CDVPluginResult* result = [CDVPluginResult
+
+                               resultWithStatus:CDVCommandStatus_OK
+                               messageAsString:msg];
+
+    [self.commandDelegate sendPluginResult:result callbackId:callbackId];
+}
+
+- (void)getDeviceGroupByDeviceId:(CDVInvokedUrlCommand*)command
+{
+    NSLog(@"%@", NSStringFromSelector(_cmd));
+
+    NSString* callbackId = [command callbackId];
+
+    id deviceId = [command argumentAtIndex:0];
+
+    DeviceGroup* currentGroup = [[HKWControlHandler sharedInstance] getDeviceGroupByDeviceId:(long long) deviceId];
+
+    NSString* msg = [NSString stringWithFormat: @"%d", currentGroup];
+
+    CDVPluginResult* result = [CDVPluginResult
+
+                               resultWithStatus:CDVCommandStatus_OK
+                               messageAsString:msg];
+
+    [self.commandDelegate sendPluginResult:result callbackId:callbackId];
+}
+
+- (void)getDeviceInfoById:(CDVInvokedUrlCommand*)command
+{
+    NSLog(@"%@", NSStringFromSelector(_cmd));
+
+    NSString* callbackId = [command callbackId];
+
+    id deviceId = [command argumentAtIndex:0];
+
+    DeviceInfo *deviceInfo = [[HKWControlHandler sharedInstance] getDeviceInfoById:(long long) deviceId];
+
+    NSString* msg = [NSString stringWithFormat: @"%d", *deviceInfo];
+
+    CDVPluginResult* result = [CDVPluginResult
+
+                               resultWithStatus:CDVCommandStatus_OK
+                               messageAsString:msg];
+
+    [self.commandDelegate sendPluginResult:result callbackId:callbackId];
+}
+
+- (void)isDeviceAvailable:(CDVInvokedUrlCommand*)command
+{
+    NSLog(@"%@", NSStringFromSelector(_cmd));
+
+    NSString* callbackId = [command callbackId];
+
+    id deviceId = [command argumentAtIndex:0];
+
+    BOOL success = [[HKWControlHandler sharedInstance] isDeviceAvailable:(long long)deviceId];
+
+    NSString* msg = [NSString stringWithFormat: @"%d", success];
+
+    CDVPluginResult* result = [CDVPluginResult
+
+                               resultWithStatus:CDVCommandStatus_OK
+                               messageAsString:msg];
+
+    [self.commandDelegate sendPluginResult:result callbackId:callbackId];
+}
+
+- (void)isDeviceActive:(CDVInvokedUrlCommand*)command
+{
+    NSLog(@"%@", NSStringFromSelector(_cmd));
+
+    NSString* callbackId = [command callbackId];
+
+    id deviceId = [command argumentAtIndex:0];
+
+    BOOL success = [[HKWControlHandler sharedInstance] isDeviceActive:(long long)deviceId];
+
+    NSString* msg = [NSString stringWithFormat: @"%d", success];
+
+    CDVPluginResult* result = [CDVPluginResult
+
+                               resultWithStatus:CDVCommandStatus_OK
+                               messageAsString:msg];
+
+    [self.commandDelegate sendPluginResult:result callbackId:callbackId];
+}
+
+- (void)removeDeviceFromGroup:(CDVInvokedUrlCommand*)command
+{
+    NSLog(@"%@", NSStringFromSelector(_cmd));
+
+    NSString* callbackId = [command callbackId];
+
+    id deviceId = [command argumentAtIndex:0];
+    NSString* msg = [NSString stringWithFormat: @"device removed from group"];
+
+    [[HKWControlHandler sharedInstance] removeDeviceFromGroup:(long long)deviceId];
+
+    CDVPluginResult* result = [CDVPluginResult
+
+                               resultWithStatus:CDVCommandStatus_OK
+                               messageAsString:msg];
+
+    [self.commandDelegate sendPluginResult:result callbackId:callbackId];
+}
+
+- (void)getDeviceGroupByIndex:(CDVInvokedUrlCommand*)command
+{
+    NSLog(@"%@", NSStringFromSelector(_cmd));
+
+    NSString* callbackId = [command callbackId];
+
+    id groupIndex = [command argumentAtIndex:0];
+    DeviceGroup* deviceGroup = [[HKWControlHandler sharedInstance] getDeviceGroupByIndex:[groupIndex integerValue]];
+
+    NSString* msg = [NSString stringWithFormat: @"%d", deviceGroup];
+
+    CDVPluginResult* result = [CDVPluginResult
+
+                               resultWithStatus:CDVCommandStatus_OK
+                               messageAsString:msg];
+
+    [self.commandDelegate sendPluginResult:result callbackId:callbackId];
+}
+
+- (void)getDeviceGroupByGroupId:(CDVInvokedUrlCommand*)command
+{
+    NSLog(@"%@", NSStringFromSelector(_cmd));
+
+    NSString* callbackId = [command callbackId];
+
+    id groupId = [command argumentAtIndex:0];
+    DeviceGroup* deviceGroup = [[HKWControlHandler sharedInstance] getDeviceGroupByGroupId:(long long) groupId];
+
+    NSString* msg = [NSString stringWithFormat: @"%d", deviceGroup];
+
+    CDVPluginResult* result = [CDVPluginResult
+
+                               resultWithStatus:CDVCommandStatus_OK
+                               messageAsString:msg];
+
+    [self.commandDelegate sendPluginResult:result callbackId:callbackId];
+}
+
+- (void)getDeviceGroupNameByIndex:(CDVInvokedUrlCommand*)command
+{
+    NSLog(@"%@", NSStringFromSelector(_cmd));
+
+    NSString* callbackId = [command callbackId];
+
+    id groupIndex = [command argumentAtIndex:0];
+    NSString* deviceGroupName = [[HKWControlHandler sharedInstance] getDeviceGroupNameByIndex:[groupIndex integerValue]];
+
+    NSString* msg = [NSString stringWithFormat: @"%d", deviceGroupName];
+
+    CDVPluginResult* result = [CDVPluginResult
+
+                               resultWithStatus:CDVCommandStatus_OK
+                               messageAsString:msg];
+
+    [self.commandDelegate sendPluginResult:result callbackId:callbackId];
+}
+
+- (void)getDeviceGroupIdByIndex:(CDVInvokedUrlCommand*)command
+{
+    NSLog(@"%@", NSStringFromSelector(_cmd));
+
+    NSString* callbackId = [command callbackId];
+
+    id groupIndex = [command argumentAtIndex:0];
+    NSNumber *deviceGroupId = [[HKWControlHandler sharedInstance] getDeviceGroupIdByIndex:[groupIndex integerValue]];
+
+    NSString* msg = [NSString stringWithFormat: @"%d", deviceGroupId];
+
+    CDVPluginResult* result = [CDVPluginResult
+
+                               resultWithStatus:CDVCommandStatus_OK
+                               messageAsString:msg];
+
+    [self.commandDelegate sendPluginResult:result callbackId:callbackId];
+}
+
+- (void)setDeviceName:(CDVInvokedUrlCommand*)command
+{
+    NSLog(@"%@", NSStringFromSelector(_cmd));
+
+    NSString* callbackId = [command callbackId];
+
+    id deviceId = [command argumentAtIndex:0];
+    NSString* deviceName = [command argumentAtIndex:1];
+
+    BOOL success = [[HKWControlHandler sharedInstance] setDeviceName:(long long)deviceId deviceName:(NSString *)deviceName];
+
+    NSString* msg = [NSString stringWithFormat: @"%d", success];
+
+    CDVPluginResult* result = [CDVPluginResult
+
+                               resultWithStatus:CDVCommandStatus_OK
+                               messageAsString:msg];
+
+    [self.commandDelegate sendPluginResult:result callbackId:callbackId];
+}
+
+- (void)setDeviceGroupName:(CDVInvokedUrlCommand*)command
+{
+    NSLog(@"%@", NSStringFromSelector(_cmd));
+
+    NSString* callbackId = [command callbackId];
+
+    id deviceId = [command argumentAtIndex:0];
+    NSString* groupName = [command argumentAtIndex:1];
+
+    BOOL success = [[HKWControlHandler sharedInstance] setDeviceName:(long long)deviceId groupName:(NSString *)groupName];
+
+    NSString* msg = [NSString stringWithFormat: @"%d", success];
+
+    CDVPluginResult* result = [CDVPluginResult
+
+                               resultWithStatus:CDVCommandStatus_OK
+                               messageAsString:msg];
+
+    [self.commandDelegate sendPluginResult:result callbackId:callbackId];
+}
+
+- (void)setDeviceRole:(CDVInvokedUrlCommand*)command
+{
+    NSLog(@"%@", NSStringFromSelector(_cmd));
+
+    NSString* callbackId = [command callbackId];
+
+    id deviceId = [command argumentAtIndex:0];
+    id role = [command argumentAtIndex:1];
+
+    BOOL success = [[HKWControlHandler sharedInstance] setDeviceRole:(long long)deviceId role:[role integerValue]];
+
+    NSString* msg = [NSString stringWithFormat: @"%d", success];
+
+    CDVPluginResult* result = [CDVPluginResult
+
+                               resultWithStatus:CDVCommandStatus_OK
+                               messageAsString:msg];
+
+    [self.commandDelegate sendPluginResult:result callbackId:callbackId];
+}
+
+- (void)getActiveGroupCount:(CDVInvokedUrlCommand*)command
+{
+    NSLog(@"%@", NSStringFromSelector(_cmd));
+
+    NSString* callbackId = [command callbackId];
+    NSInteger activeGroupCount = [[HKWControlHandler sharedInstance] getActiveGroupCount];
+    NSString* msg = [NSString stringWithFormat: @"%d", activeGroupCount];
+
+    CDVPluginResult* result = [CDVPluginResult
+
+                               resultWithStatus:CDVCommandStatus_OK
+                               messageAsString:msg];
+
+    [self.commandDelegate sendPluginResult:result callbackId:callbackId];
+}
+
+- (void)refreshDeviceWiFiSignal:(CDVInvokedUrlCommand*)command
+{
+    NSLog(@"%@", NSStringFromSelector(_cmd));
+
+    NSString* callbackId = [command callbackId];
+
+    id deviceId = [command argumentAtIndex:0];
+
+    BOOL success = [[HKWControlHandler sharedInstance] refreshDeviceWiFiSignal:(long long)deviceId];
+
+    NSString* msg = [NSString stringWithFormat: @"%d", success];
+
+    CDVPluginResult* result = [CDVPluginResult
+
+                               resultWithStatus:CDVCommandStatus_OK
+                               messageAsString:msg];
+
+    [self.commandDelegate sendPluginResult:result callbackId:callbackId];
+}
+
+- (void)getWifiSignalStrengthType:(CDVInvokedUrlCommand*)command
+{
+    NSLog(@"%@", NSStringFromSelector(_cmd));
+
+    NSString* callbackId = [command callbackId];
+
+    NSInteger wifiSignal = [[HKWControlHandler sharedInstance] getWifiSignalStrengthType:(NSInteger)wifiSignal];
+
+    NSString* msg = [NSString stringWithFormat: @"%d", wifiSignal];
+
+    CDVPluginResult* result = [CDVPluginResult
+
+                               resultWithStatus:CDVCommandStatus_OK
+                               messageAsString:msg];
+
+    [self.commandDelegate sendPluginResult:result callbackId:callbackId];
+}
+
+
+// ===============================================================
+#pragma mark - HKWDeviceEventHandlerSingleton
+
+
+// ===============================================================
+#pragma mark - HKWDeviceEventHandlerDelegate
+
+-(void)hkwDeviceStateUpdated:(long long)deviceId withReason:(NSInteger)reason{
+
+    NSInteger activeDeviceCount  = [[HKWControlHandler sharedInstance] getActiveDeviceCount];
+    NSInteger groupCount         = [[HKWControlHandler sharedInstance] getGroupCount];
+    NSString *groupName          = [[HKWControlHandler sharedInstance] getDeviceGroupNameByIndex:0];
+    NSInteger deviceCount        = [[HKWControlHandler sharedInstance] getDeviceCountInGroupIndex:0];
+    DeviceInfo *deviceInfo       = [[HKWControlHandler sharedInstance] getDeviceInfoByGroupIndexAndDeviceIndex:0 deviceIndex:0];
+
+    NSLog(@"%@ deviceId: %lld", NSStringFromSelector(_cmd), deviceId);
+    NSLog(@"Active device count: %d", activeDeviceCount);
+    NSLog(@"Group count: %d", groupCount);
+    NSLog(@"Group Name: %@", groupName);
+    NSLog(@"Device Count: %d",  deviceCount);
+    NSLog(@"Device Info IP: %@",  deviceInfo.ipAddress);
+    NSLog(@"Device Info Name: %@",  deviceInfo.deviceName);
+
+    //Add Device to Session (select device)
+    // [[HKWControlHandler sharedInstance] addDeviceToSession:deviceInfo.deviceId];
+
+    //Remove Device from Session (select device)
+    // [[HKWControlHandler sharedInstance] removeDeviceFromSession:deviceInfo.deviceId];
+
+    [self updateDeviceStatus:deviceId];
+}
+
+
+-(void)hkwErrorOccurred:(NSInteger)errorCode withErrorMessage:(NSString*)errorMesg{
+    NSLog(@"%@: %@", NSStringFromSelector(_cmd), errorMesg);
+
+}
+
+
+// ===============================================================
+#pragma mark - HKWPlayerEventHandlerSingleton
+
+
+// ===============================================================
+#pragma mark - HKWPlayerEventHandlerDelegate
+-(void)hkwPlayEnded{
+
+}
+
+// ===============================================================
+#pragma mark - Helper Functions
 
 - (void)updateDeviceStatus:(long long)deviceId
 {
@@ -356,7 +949,7 @@
     [deviceData setObject:currentDevice.groupName forKey:@"groupName"];
     /*! The model name of the speaker */
     [deviceData setObject:currentDevice.modelName forKey:@"modelName"];
-    /*! The zone name of the speaker. The zone name is used for representing group ID and group name in a single string, separated by '#&#' */
+    /*! The zone name of the speaker. The ZN is used for representing group ID & group name in a single string, separated by '#&#' */
     [deviceData setObject:currentDevice.zoneName forKey:@"zoneName"];
     /*! The current volume level of the speaker */
     [deviceData setObject:[NSNumber numberWithInteger:currentDevice.volume] forKey:@"volume"];
@@ -381,9 +974,7 @@
 }
 
 
-
-/* Get the current Group info.
- */
+/* Get the current Group info. */
 - (NSDictionary*)getGroupInfo:(long long)deviceId
 {
     DeviceGroup* currentGroup = [[HKWControlHandler sharedInstance] getDeviceGroupByDeviceId:deviceId];
@@ -404,45 +995,12 @@
     return groupData;
 }
 
-#pragma mark - HKWDeviceEventHandler Delegate
 
--(void)hkwDeviceStateUpdated:(long long)deviceId withReason:(NSInteger)reason{
-
-    NSInteger activeDeviceCount  = [[HKWControlHandler sharedInstance] getActiveDeviceCount];
-    NSInteger groupCount         = [[HKWControlHandler sharedInstance] getGroupCount];
-    NSString *groupName          = [[HKWControlHandler sharedInstance] getDeviceGroupNameByIndex:0];
-    NSInteger deviceCount        = [[HKWControlHandler sharedInstance] getDeviceCountInGroupIndex:0];
-    DeviceInfo *deviceInfo       = [[HKWControlHandler sharedInstance] getDeviceInfoByGroupIndexAndDeviceIndex:0 deviceIndex:0];
-
-    NSLog(@"%@ deviceId: %lld", NSStringFromSelector(_cmd), deviceId);
-    NSLog(@"Active device count: %d", activeDeviceCount);
-    NSLog(@"Group count: %d", groupCount);
-    NSLog(@"Group Name: %@", groupName);
-    NSLog(@"Device Count: %d",  deviceCount);
-    NSLog(@"Device Info IP: %@",  deviceInfo.ipAddress);
-    NSLog(@"Device Info Name: %@",  deviceInfo.deviceName);
-
-    //Add Device to Session (select device)
-    // [[HKWControlHandler sharedInstance] addDeviceToSession:deviceInfo.deviceId];
-
-    //Remove Device from Session (select device)
-    // [[HKWControlHandler sharedInstance] removeDeviceFromSession:deviceInfo.deviceId];
-
-    [self updateDeviceStatus:deviceId];
-}
-
-
--(void)hkwErrorOccurred:(NSInteger)errorCode withErrorMessage:(NSString*)errorMesg{
-    NSLog(@"%@: %@", NSStringFromSelector(_cmd), errorMesg);
-
-}
-
-#pragma mark -  HKWPlayerEventHandlerDelegate Delegate
-
-
--(void)hkwPlayEnded{
-
-}
+// ---------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------
 
 
 @end
