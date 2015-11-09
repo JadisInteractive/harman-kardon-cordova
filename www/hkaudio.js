@@ -144,8 +144,8 @@ module.exports = {
     refreshDeviceWiFiSignal: function(successCallback, errorCallback, deviceId) {
         cordova.exec(successCallback, errorCallback, "HKAudio", "refreshDeviceWiFiSignal", [deviceId]);
     },
-    getWifiSignalStrengthType: function(successCallback, errorCallback) {
-        cordova.exec(successCallback, errorCallback, "HKAudio", "getWifiSignalStrengthType");
+    getWifiSignalStrengthType: function(successCallback, errorCallback, wifiSignal) {
+        cordova.exec(successCallback, errorCallback, "HKAudio", "getWifiSignalStrengthType", [wifiSignal]);
     }
 
 };
