@@ -94,7 +94,7 @@
     NSString* callbackId = [command callbackId];
     NSString* msg = [NSString stringWithFormat: @"continuous refreshing started. refreshes every two seconds."];
 
-    [[0 sharedInstance] startRefreshDeviceInfo];
+    [[HKWControlHandler sharedInstance] startRefreshDeviceInfo];
 
     CDVPluginResult* result = [CDVPluginResult
 
@@ -218,7 +218,7 @@
 
 }
 
-- (void)playWAV:(CDVInvokedUrlCommand*)command
+/* - (void)playWAV:(CDVInvokedUrlCommand*)command
 {
     NSString* soundFilePath = (NSString *)[command argumentAtIndex:0];
 
@@ -234,9 +234,9 @@
                                 messageAsString:msg];
 
     [self.commandDelegate sendPluginResult:result callbackId:callbackId];
-}
+} */
 
-- (void)playStreamingMedia:(CDVInvokedUrlCommand*)command
+/* - (void)playStreamingMedia:(CDVInvokedUrlCommand*)command
 {
     NSString* streamingMediaUrl = (NSString *)[command argumentAtIndex:0];
 
@@ -252,7 +252,7 @@
                                 messageAsString:msg];
 
     [self.commandDelegate sendPluginResult:result callbackId:callbackId];
-}
+} */
 
 - (void)getPlayerState:(CDVInvokedUrlCommand*)command
 {
@@ -260,7 +260,7 @@
 
     NSString* callbackId = [command callbackId];
     NSInteger getPlayerState = [[HKWControlHandler sharedInstance] getPlayerState];
-    NSString* msg = [NSString stringWithFormat: @"%d", getPlayerState];
+    NSString* msg = [NSString stringWithFormat: @"%ld", (long)getPlayerState];
 
 
     CDVPluginResult* result = [CDVPluginResult
@@ -321,10 +321,14 @@
     id deviceId = [command argumentAtIndex:0];
     id volume = [command argumentAtIndex:1];
 
-    NSString* callbackId = [command callbackId];
-
     [[HKWControlHandler sharedInstance] setVolumeDevice:[volume integerValue]];
+    NSString* msg = [NSString stringWithFormat: @"volume set"];
 
+    CDVPluginResult* result = [CDVPluginResult
+                               
+                               resultWithStatus:CDVCommandStatus_OK
+                               messageAsString:msg];
+    
     [self.commandDelegate sendPluginResult:result callbackId:callbackId];
 }
 
@@ -335,7 +339,7 @@
     NSString* callbackId = [command callbackId];
 
     NSInteger getVolume = [[HKWControlHandler sharedInstance] getVolume];
-    NSString* msg = [NSString stringWithFormat: @"%d", getVolume];
+    NSString* msg = [NSString stringWithFormat: @"%ld", (long)getVolume];
 
 
     CDVPluginResult* result = [CDVPluginResult
@@ -370,7 +374,7 @@
 
     NSString* callbackId = [command callbackId];
     NSInteger getMaximumVolumeLevel = [[HKWControlHandler sharedInstance] getMaximumVolumeLevel];
-    NSString* msg = [NSString stringWithFormat: @"%d", getMaximumVolumeLevel];
+    NSString* msg = [NSString stringWithFormat: @"%ld", (long)getMaximumVolumeLevel];
 
 
     CDVPluginResult* result = [CDVPluginResult
@@ -425,7 +429,7 @@
 
     NSString* callbackId = [command callbackId];
     NSInteger deviceCount = [[HKWControlHandler sharedInstance] getActiveDeviceCount];
-    NSString* msg = [NSString stringWithFormat: @"%d", deviceCount];
+    NSString* msg = [NSString stringWithFormat: @"%ld", (long)deviceCount];
 
 
     CDVPluginResult* result = [CDVPluginResult
@@ -442,7 +446,7 @@
 
     NSString* callbackId = [command callbackId];
     NSInteger groupCount = [[HKWControlHandler sharedInstance] getGroupCount];
-    NSString* msg = [NSString stringWithFormat: @"%d", groupCount];
+    NSString* msg = [NSString stringWithFormat: @"%ld", (long)groupCount];
 
 
     CDVPluginResult* result = [CDVPluginResult
@@ -459,7 +463,7 @@
 
     NSString* callbackId = [command callbackId];
     NSInteger deviceCount = [[HKWControlHandler sharedInstance] getDeviceCount];
-    NSString* msg = [NSString stringWithFormat: @"%d", deviceCount];
+    NSString* msg = [NSString stringWithFormat: @"%ld", (long)deviceCount];
 
 
     CDVPluginResult* result = [CDVPluginResult
@@ -515,7 +519,7 @@
     NSInteger groupCount = [[HKWControlHandler sharedInstance] getGroupCount];
     NSInteger groupIndex = groupCount - 1;
     NSInteger deviceCount = [[HKWControlHandler sharedInstance] getDeviceCountInGroupIndex:(NSInteger)groupIndex];
-    NSString* msg = [NSString stringWithFormat: @"%d", deviceCount];
+    NSString* msg = [NSString stringWithFormat: @"%ld", (long)deviceCount];
 
     CDVPluginResult* result = [CDVPluginResult
 
@@ -536,7 +540,7 @@
     NSInteger groupIndex = groupCount - 1;
     NSInteger deviceIndex = deviceCount - 1;
 
-    DeviceInfo *deviceInfo = [[HKWControlHandler sharedInstance] getDeviceInfoByGroupIndexAndDeviceIndex:(NSInteger) groupIndex deviceIndex:(NSInteger) deviceIndex)];
+    DeviceInfo *deviceInfo = [[HKWControlHandler sharedInstance] getDeviceInfoByGroupIndexAndDeviceIndex:(NSInteger) groupIndex deviceIndex:[(NSInteger) deviceIndex]];
 
     NSString* msg = [NSString stringWithFormat: @"%d", *deviceInfo];
 
@@ -557,7 +561,7 @@
     NSInteger deviceCount = [[HKWControlHandler sharedInstance] getDeviceCount];
     NSInteger deviceIndex = deviceCount - 1;
 
-    DeviceInfo *deviceInfo = [[HKWControlHandler sharedInstance] getDeviceInfoByIndex:(NSInteger)deviceIndex)];
+    DeviceInfo *deviceInfo = [[HKWControlHandler sharedInstance] getDeviceInfoByIndex:[(NSInteger)deviceIndex]];
 
     NSString* msg = [NSString stringWithFormat: @"%d", *deviceInfo];
 
@@ -579,7 +583,7 @@
 
     DeviceGroup* currentGroup = [[HKWControlHandler sharedInstance] getDeviceGroupByDeviceId:(long long) deviceId];
 
-    NSString* msg = [NSString stringWithFormat: @"%d", currentGroup];
+    NSString* msg = [NSString stringWithFormat: @"%@", currentGroup];
 
     CDVPluginResult* result = [CDVPluginResult
 
@@ -677,7 +681,7 @@
     id groupIndex = [command argumentAtIndex:0];
     DeviceGroup* deviceGroup = [[HKWControlHandler sharedInstance] getDeviceGroupByIndex:[groupIndex integerValue]];
 
-    NSString* msg = [NSString stringWithFormat: @"%d", deviceGroup];
+    NSString* msg = [NSString stringWithFormat: @"%@", deviceGroup];
 
     CDVPluginResult* result = [CDVPluginResult
 
@@ -696,7 +700,7 @@
     id groupId = [command argumentAtIndex:0];
     DeviceGroup* deviceGroup = [[HKWControlHandler sharedInstance] getDeviceGroupByGroupId:(long long) groupId];
 
-    NSString* msg = [NSString stringWithFormat: @"%d", deviceGroup];
+    NSString* msg = [NSString stringWithFormat: @"%@", deviceGroup];
 
     CDVPluginResult* result = [CDVPluginResult
 
@@ -715,7 +719,7 @@
     id groupIndex = [command argumentAtIndex:0];
     NSString* deviceGroupName = [[HKWControlHandler sharedInstance] getDeviceGroupNameByIndex:[groupIndex integerValue]];
 
-    NSString* msg = [NSString stringWithFormat: @"%d", deviceGroupName];
+    NSString* msg = [NSString stringWithFormat: @"%@", deviceGroupName];
 
     CDVPluginResult* result = [CDVPluginResult
 
@@ -734,7 +738,7 @@
     id groupIndex = [command argumentAtIndex:0];
     NSNumber *deviceGroupId = [[HKWControlHandler sharedInstance] getDeviceGroupIdByIndex:[groupIndex integerValue]];
 
-    NSString* msg = [NSString stringWithFormat: @"%d", deviceGroupId];
+    NSString* msg = [NSString stringWithFormat: @"%@", deviceGroupId];
 
     CDVPluginResult* result = [CDVPluginResult
 
